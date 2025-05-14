@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  pokemon:
+    build:
+      context: ./apirest-pokemon
+      dockerfile: Dockerfile
+    container_name: spring-pokemon
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./my-react-app
+      dockerfile: Dockerfile
+    container_name: react-pokemon
+    ports:
+      - "3000:3000"
+    depends_on:
+      - pokemon
+    networks:
+      - app-network
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - pokemon
+      - frontend
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
