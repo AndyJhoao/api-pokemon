@@ -18,6 +18,8 @@ Clona este repositorio en tu máquina local utilizando Git:
 git clone https://github.com/AndyJhoao/api-pokemon.git
 cd api-pokemon
 
+git checkout master
+
 docker-compose up --build
 
 docker-compose up -d
