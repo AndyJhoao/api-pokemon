@@ -1,6 +1,11 @@
-.gradle/
-build/
-*.log
-.idea/
-*.iml
-*.class
+# Mantén esto al inicio del archivo
+*
+!gradle/
+!gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+!build.gradle
+!settings.gradle
+!src/
