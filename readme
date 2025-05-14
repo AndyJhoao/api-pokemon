@@ -1,0 +1,25 @@
+# API Pokémon
+
+Este proyecto proporciona una API para obtener información sobre Pokémon utilizando Spring Boot y Gradle. Además, el frontend es una aplicación React que interactúa con esta API.
+
+## Requisitos
+
+Antes de empezar, asegúrate de tener instalados los siguientes programas:
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Git](https://git-scm.com/)
+
+## Clonar el repositorio
+
+Clona este repositorio en tu máquina local utilizando Git:
+
+```bash
+git clone https://github.com/AndyJhoao/api-pokemon.git
+cd api-pokemon
+
+docker-compose up --build
+
+docker-compose up -d
+
+http://localhost
