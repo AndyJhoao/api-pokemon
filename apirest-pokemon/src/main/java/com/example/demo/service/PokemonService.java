@@ -11,11 +11,15 @@ public class PokemonService {
     private final String POKEAPI_URL = "https://pokeapi.co/api/v2/pokemon/";
 
     public PokemonResponse getPokemonInfo(String name) {
+        String sanitized = name.toLowerCase().replaceAll("[^a-z0-9-]", "");
+        if (sanitized.isEmpty()) {
+            throw new IllegalArgumentException("Invalid pokemon name");
+        }
         RestTemplate restTemplate = new RestTemplate();
         try {
-            return restTemplate.getForObject(POKEAPI_URL + name.toLowerCase(), PokemonResponse.class);
+            return restTemplate.getForObject(POKEAPI_URL + sanitized, PokemonResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
-            throw new RuntimeException("Pokémon no encontrado: " + name);
+            throw new RuntimeException("Pokémon not found: " + sanitized);
         }
     }
 }
