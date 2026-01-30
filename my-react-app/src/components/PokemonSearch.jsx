@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Autocomplete from './Autocomplete';
+import EvolutionChain from './EvolutionChain';
 import { useAuth } from '../context/AuthContext';
 
 const TYPE_COLORS = {
@@ -9,6 +10,14 @@ const TYPE_COLORS = {
   rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746',
   steel: '#B7B7CE', fairy: '#D685AD',
 };
+
+const TYPE_IDS = {
+  normal: 1, fighting: 2, flying: 3, poison: 4, ground: 5, rock: 6,
+  bug: 7, ghost: 8, steel: 9, fire: 10, water: 11, grass: 12,
+  electric: 13, psychic: 14, ice: 15, dragon: 16, dark: 17, fairy: 18,
+};
+
+const TYPE_ICON_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-ix/scarlet-violet/';
 
 function StatBar({ label, value }) {
   const max = 255;
@@ -26,10 +35,22 @@ function StatBar({ label, value }) {
 }
 
 function TypeBadge({ type }) {
-  const bg = TYPE_COLORS[type.toLowerCase()] || '#777';
+  const key = type.toLowerCase();
+  const bg = TYPE_COLORS[key] || '#777';
+  const typeId = TYPE_IDS[key];
   return (
-    <span className="px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider shadow-md" style={{ backgroundColor: bg }}>
-      {type}
+    <span className="group relative inline-flex items-center justify-center cursor-default">
+      {typeId && (
+        <img
+          src={`${TYPE_ICON_URL}${typeId}.png`}
+          alt={type}
+          className="w-25 h-25 object-contain"
+          onError={(e) => { e.target.style.display = 'none'; }}
+        />
+      )}
+      <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 capitalize">
+        {type} type
+      </span>
     </span>
   );
 }
@@ -55,6 +76,17 @@ export default function PokemonSearch() {
   const [pokemonName, setPokemonName] = useState('pikachu');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [autoDiscover, setAutoDiscover] = useState(() => {
+    try { return localStorage.getItem('autoDiscover') === 'true'; } catch { return false; }
+  });
+
+  const toggleAutoDiscover = () => {
+    setAutoDiscover(prev => {
+      const next = !prev;
+      try { localStorage.setItem('autoDiscover', String(next)); } catch {}
+      return next;
+    });
+  };
 
   const fetchPokemon = async (name) => {
     const trimmed = (name || '').trim().toLowerCase();
@@ -150,6 +182,45 @@ export default function PokemonSearch() {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Evolution Chain */}
+      {pokemon && !loading && pokemon.evolutionTree && (
+        <div className="card-enter w-full flex flex-col items-center">
+          {/* Auto Discover Toggle */}
+          <div className="flex items-center gap-2 mt-6 mb-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Auto Discover</span>
+            <button
+              onClick={toggleAutoDiscover}
+              className={`relative w-10 h-5 rounded-full transition-colors ${autoDiscover ? 'bg-amber-400' : 'bg-gray-300 dark:bg-gray-600'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${autoDiscover ? 'translate-x-5' : ''}`} />
+            </button>
+          </div>
+
+          <EvolutionChain
+            evolutionTree={pokemon.evolutionTree}
+            currentPokemonName={pokemon.name}
+            currentSprite={pokemon.sprites}
+            currentTypes={pokemon.types}
+            autoDiscover={autoDiscover}
+            token={token}
+          />
+
+          {/* Mega Evolutions */}
+          {pokemon.megaEvolutions && pokemon.megaEvolutions.length > 0 && (
+            <div className="mt-4 w-full max-w-2xl">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 text-center">Mega Evolutions</h3>
+              <div className="flex justify-center gap-2 flex-wrap">
+                {pokemon.megaEvolutions.map(mega => (
+                  <span key={mega} className="px-3 py-1 bg-purple-100 dark:bg-purple-500/20 border border-purple-300 dark:border-purple-500/30 rounded-lg text-sm text-purple-700 dark:text-purple-300 capitalize">
+                    {mega.replace(/-/g, ' ')}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

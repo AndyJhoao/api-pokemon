@@ -24,6 +24,10 @@ public class PokemonResponse {
     @JsonProperty("sprites")
     private Sprites sprites;
 
+    // Set by PokemonService after fetching species + evolution chain
+    private EvolutionNode evolutionTree;
+    private List<String> megaEvolutions;
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class Sprites {
         @JsonProperty("front_default")
@@ -101,5 +105,21 @@ public class PokemonResponse {
 
     public String getSprites() {
         return sprites.front_default;
+    }
+
+    public EvolutionNode getEvolutionTree() {
+        return evolutionTree;
+    }
+
+    public void setEvolutionTree(EvolutionNode evolutionTree) {
+        this.evolutionTree = evolutionTree;
+    }
+
+    public List<String> getMegaEvolutions() {
+        return megaEvolutions;
+    }
+
+    public void setMegaEvolutions(List<String> megaEvolutions) {
+        this.megaEvolutions = megaEvolutions;
     }
 }
