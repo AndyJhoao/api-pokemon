@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Autocomplete from './Autocomplete';
 import EvolutionChain from './EvolutionChain';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl } from '../config/api';
 
 const TYPE_COLORS = {
   normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C',
@@ -94,7 +95,7 @@ export default function PokemonSearch() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/pokemon/${trimmed}`, {
+      const response = await fetch(apiUrl(`/api/pokemon/${trimmed}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 429) {

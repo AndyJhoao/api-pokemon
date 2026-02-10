@@ -19,6 +19,16 @@ COPY src src
 RUN ./gradlew build --no-daemon -x test
 
 FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
 COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Variables de entorno para Render (se configuran en el dashboard)
+ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=prod
+
+EXPOSE ${PORT}
+
+# Render requiere que la app escuche en el puerto definido por $PORT
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]

@@ -1,0 +1,55 @@
+# Render Blueprint - Pokemon API
+# Docs: https://render.com/docs/blueprint-spec
+
+databases:
+  - name: pokemon-db
+    databaseName: pokemondb
+    user: pokemon
+    plan: free
+    region: oregon
+
+services:
+  # Backend - Spring Boot API
+  - type: web
+    name: pokemon-api
+    runtime: docker
+    dockerfilePath: ./apirest-pokemon/Dockerfile
+    dockerContext: ./apirest-pokemon
+    region: oregon
+    plan: free
+    healthCheckPath: /api/auth/guest
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pokemon-db
+          property: connectionString
+      - key: JDBC_DATABASE_URL
+        fromDatabase:
+          name: pokemon-db
+          property: connectionString
+      - key: DB_USER
+        fromDatabase:
+          name: pokemon-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: pokemon-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://pokemon.andy-jhoao.com,https://pokemon-frontend-XXXX.onrender.com
+
+  # Frontend - React App
+  - type: web
+    name: pokemon-frontend
+    runtime: docker
+    dockerfilePath: ./my-react-app/Dockerfile
+    dockerContext: ./my-react-app
+    region: oregon
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: https://pokemon-api-XXXX.onrender.com

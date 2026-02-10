@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Autocomplete from '../components/Autocomplete';
+import { apiUrl } from '../config/api';
 
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
@@ -29,7 +30,7 @@ export default function ProfilePage() {
     }
     setSpriteError(false);
     try {
-      const res = await fetch(`/api/pokemon/${name.toLowerCase()}`);
+      const res = await fetch(apiUrl(`/api/pokemon/${name.toLowerCase()}`));
       if (res.ok) {
         const data = await res.json();
         const sprite = data.sprites || null;

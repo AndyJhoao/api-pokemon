@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from '../config/api';
 
 const TYPE_COLORS = {
   normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C',
@@ -199,7 +200,7 @@ function RevealedCard({ name, sprite, types, isCurrent }) {
                   <img
                     src={`${TYPE_ICON_URL}${typeId}.png`}
                     alt={t}
-                    className="w-20 h-20 object-contain"
+                    className="w-20 object-contain"
                     onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'inline-block'; }}
                   />
                 ) : null}
@@ -438,7 +439,7 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
   const fetchEvoSprite = async (name) => {
     if (evoData[name]) return;
     try {
-      const res = await fetch(`/api/pokemon/${name}`, {
+      const res = await fetch(apiUrl(`/api/pokemon/${name}`), {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {

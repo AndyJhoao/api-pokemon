@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl } from '../config/api';
 
 export default function Autocomplete({ value, onChange, onSelect, placeholder, className }) {
   const { token } = useAuth();
@@ -19,7 +20,7 @@ export default function Autocomplete({ value, onChange, onSelect, placeholder, c
     debounceRef.current = setTimeout(async () => {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await fetch(`/api/pokemon-list?q=${encodeURIComponent(value)}`, { headers });
+        const res = await fetch(apiUrl(`/api/pokemon-list?q=${encodeURIComponent(value)}`), { headers });
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data);
