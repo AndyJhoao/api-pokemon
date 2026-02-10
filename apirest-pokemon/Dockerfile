@@ -10,7 +10,8 @@ COPY settings.gradle .
 
 RUN apt-get update && \
     apt-get install -y dos2unix && \
-    sed -i -e 's/\r$//' gradlew
+    sed -i -e 's/\r$//' gradlew && \
+    chmod +x gradlew
 
 RUN ./gradlew dependencies --no-daemon
 
