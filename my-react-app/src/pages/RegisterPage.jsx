@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import EyeToggle from '../components/EyeToggle';
+import ButtonSpinner from '../components/ButtonSpinner';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -9,17 +10,21 @@ export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       await register(email, password, displayName);
       navigate('/');
     } catch {
       setError('Registration failed. Email may already be in use.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,9 +70,10 @@ export default function RegisterPage() {
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95"
+            disabled={loading}
+            className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            Register
+            {loading ? <><ButtonSpinner /> Creating account...</> : 'Register'}
           </button>
         </form>
 

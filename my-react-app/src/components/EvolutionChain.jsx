@@ -150,26 +150,43 @@ function ChainLink({ condition }) {
   );
 }
 
+// --- Loading spinner for cards ---
+function CardSpinner() {
+  return (
+    <svg className="animate-spin h-8 w-8 text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    </svg>
+  );
+}
+
 // --- Locked card ---
-function LockedCard({ onClick }) {
+function LockedCard({ onClick, isLoading }) {
   return (
     <button
       onClick={onClick}
-      className="evo-locked group relative w-40 h-52 rounded-xl bg-gray-200/80 dark:bg-white/5 border-2 border-dashed border-gray-300 dark:border-white/20 backdrop-blur-sm cursor-pointer transition-all hover:scale-105 hover:border-amber-400 dark:hover:border-amber-400 overflow-hidden"
+      disabled={isLoading}
+      className="evo-locked group relative w-40 h-52 rounded-xl bg-gray-200/80 dark:bg-white/5 border-2 border-dashed border-gray-300 dark:border-white/20 backdrop-blur-sm cursor-pointer transition-all hover:scale-105 hover:border-amber-400 dark:hover:border-amber-400 overflow-hidden disabled:cursor-wait disabled:hover:scale-100"
     >
       <div className="absolute inset-0 evo-sparkle" />
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-4xl opacity-60 group-hover:opacity-100 transition-opacity">?</span>
+        {isLoading ? (
+          <CardSpinner />
+        ) : (
+          <span className="text-4xl opacity-60 group-hover:opacity-100 transition-opacity">?</span>
+        )}
       </div>
       <div className="absolute bottom-1 left-0 right-0 text-center">
-        <span className="text-[9px] text-gray-400 dark:text-gray-500">Click to reveal</span>
+        <span className="text-[9px] text-gray-400 dark:text-gray-500">
+          {isLoading ? 'Discovering...' : 'Click to reveal'}
+        </span>
       </div>
     </button>
   );
 }
 
 // --- Revealed card ---
-function RevealedCard({ name, sprite, types, isCurrent }) {
+function RevealedCard({ name, sprite, types, isCurrent, isLoading }) {
   return (
     <div className={`evo-reveal relative w-40 rounded-xl p-3 text-center transition-all ${
       isCurrent
@@ -181,8 +198,10 @@ function RevealedCard({ name, sprite, types, isCurrent }) {
           Current
         </div>
       )}
-      <div className="relative mx-auto w-24 h-24 mb-2">
-        {sprite ? (
+      <div className="relative mx-auto w-24 h-24 mb-2 flex items-center justify-center">
+        {isLoading && !sprite ? (
+          <CardSpinner />
+        ) : sprite ? (
           <img src={sprite} alt={name} className="w-full h-full object-contain drop-shadow-md" />
         ) : (
           <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-lg">?</div>
@@ -218,9 +237,10 @@ function RevealedCard({ name, sprite, types, isCurrent }) {
 }
 
 // --- EvoCard: wrapper that handles locked/revealed state ---
-function EvoCard({ node, isCurrent, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover }) {
+function EvoCard({ node, isCurrent, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames }) {
   const isRevealed = autoDiscover || revealed[node.name];
   const data = evoData[node.name];
+  const isLoading = loadingNames?.has(node.name);
 
   if (isRevealed) {
     return (
@@ -229,16 +249,17 @@ function EvoCard({ node, isCurrent, currentSprite, currentTypes, revealed, onRev
         sprite={isCurrent ? currentSprite : data?.sprite}
         types={isCurrent ? currentTypes : data?.types}
         isCurrent={isCurrent}
+        isLoading={isLoading && !isCurrent}
       />
     );
   }
-  return <LockedCard onClick={() => onReveal(node.name)} />;
+  return <LockedCard onClick={() => onReveal(node.name)} isLoading={isLoading} />;
 }
 
 // ============================================================
 // LAYOUT: LINEAR (charmander → charmeleon → charizard)
 // ============================================================
-function LinearLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover }) {
+function LinearLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames }) {
   const nodes = flattenLinear(tree);
   return (
     <div className="flex items-center justify-center gap-x-4">
@@ -250,7 +271,7 @@ function LinearLayout({ tree, currentPokemonName, currentSprite, currentTypes, r
             <EvoCard
               node={node} isCurrent={isCurrent}
               currentSprite={currentSprite} currentTypes={currentTypes}
-              revealed={revealed} onReveal={onReveal} evoData={evoData} autoDiscover={autoDiscover}
+              revealed={revealed} onReveal={onReveal} evoData={evoData} autoDiscover={autoDiscover} loadingNames={loadingNames}
             />
           </div>
         );
@@ -263,7 +284,7 @@ function LinearLayout({ tree, currentPokemonName, currentSprite, currentTypes, r
 // LAYOUT: FORK — base < (branch1 top, branch2 bottom)
 // Walks linear until the fork, then splits into 2 diagonal branches
 // ============================================================
-function ForkLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover }) {
+function ForkLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames }) {
   // Walk to the fork point
   const linearPart = [];
   let forkNode = tree;
@@ -275,7 +296,7 @@ function ForkLayout({ tree, currentPokemonName, currentSprite, currentTypes, rev
   linearPart.push(forkNode);
   const branches = forkNode.evolvesTo || [];
 
-  const cardProps = { currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover };
+  const cardProps = { currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames };
 
   return (
     <div className="flex items-center justify-center gap-x-4">
@@ -316,7 +337,7 @@ function ForkLayout({ tree, currentPokemonName, currentSprite, currentTypes, rev
 // LAYOUT: CIRCULAR — center pokemon surrounded by evolutions (eevee)
 // Walks linear until the node with 3+ branches, then renders circular
 // ============================================================
-function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover }) {
+function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames }) {
   // Walk linear portion until we find the node with 3+ branches
   const linearPart = [];
   let circleNode = tree;
@@ -326,7 +347,7 @@ function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes,
   }
   // circleNode has 3+ branches
   const branches = circleNode.evolvesTo || [];
-  const cardProps = { currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover };
+  const cardProps = { currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames };
 
   // Circle geometry
   const count = branches.length;
@@ -418,6 +439,7 @@ function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes,
 export default function EvolutionChain({ evolutionTree, currentPokemonName, currentSprite, currentTypes, autoDiscover, token }) {
   const [revealed, setRevealed] = useState({});
   const [evoData, setEvoData] = useState({});
+  const [loadingNames, setLoadingNames] = useState(new Set());
 
   const allNames = evolutionTree ? collectNames(evolutionTree) : [];
 
@@ -425,6 +447,7 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
   useEffect(() => {
     setRevealed({});
     setEvoData({});
+    setLoadingNames(new Set());
 
     if (autoDiscover) {
       const all = {};
@@ -438,6 +461,7 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
 
   const fetchEvoSprite = async (name) => {
     if (evoData[name]) return;
+    setLoadingNames(prev => new Set([...prev, name]));
     try {
       const res = await fetch(apiUrl(`/api/pokemon/${name}`), {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -447,6 +471,13 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
         setEvoData(prev => ({ ...prev, [name]: { sprite: data.sprites, types: data.types } }));
       }
     } catch { /* ignore */ }
+    finally {
+      setLoadingNames(prev => {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      });
+    }
   };
 
   const handleReveal = (name) => {
@@ -467,7 +498,7 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
   const commonProps = {
     tree: evolutionTree,
     currentPokemonName, currentSprite, currentTypes,
-    revealed, onReveal: handleReveal, evoData, autoDiscover,
+    revealed, onReveal: handleReveal, evoData, autoDiscover, loadingNames,
   };
 
   return (

@@ -2,29 +2,40 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import EyeToggle from '../components/EyeToggle';
+import ButtonSpinner from '../components/ButtonSpinner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
   const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       await login(email, password);
       navigate('/');
     } catch {
       setError('Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGuest = async () => {
-    await guestLogin();
-    navigate('/');
+    setGuestLoading(true);
+    try {
+      await guestLogin();
+      navigate('/');
+    } finally {
+      setGuestLoading(false);
+    }
   };
 
   return (
@@ -60,18 +71,20 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95"
+            disabled={loading}
+            className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            Login
+            {loading ? <><ButtonSpinner /> Logging in...</> : 'Login'}
           </button>
         </form>
 
         <div className="mt-4 flex flex-col gap-3">
           <button
             onClick={handleGuest}
-            className="w-full py-3 bg-white/10 hover:bg-white/20 text-gray-300 font-medium rounded-xl transition-all"
+            disabled={guestLoading}
+            className="w-full py-3 bg-white/10 hover:bg-white/20 disabled:opacity-70 text-gray-300 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
           >
-            Continue as Guest
+            {guestLoading ? <><ButtonSpinner /> Entering...</> : 'Continue as Guest'}
           </button>
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{' '}

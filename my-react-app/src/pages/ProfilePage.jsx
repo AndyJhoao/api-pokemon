@@ -4,7 +4,7 @@ import Autocomplete from '../components/Autocomplete';
 import { apiUrl } from '../config/api';
 
 export default function ProfilePage() {
-  const { user, updateProfile } = useAuth();
+  const { user, token, updateProfile } = useAuth();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [favoritePokemon, setFavoritePokemon] = useState(user?.favoritePokemon || '');
   const [profilePokemon, setProfilePokemon] = useState(user?.profilePokemon || '');
@@ -30,7 +30,9 @@ export default function ProfilePage() {
     }
     setSpriteError(false);
     try {
-      const res = await fetch(apiUrl(`/api/pokemon/${name.toLowerCase()}`));
+      const res = await fetch(apiUrl(`/api/pokemon/${name.toLowerCase()}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         const data = await res.json();
         const sprite = data.sprites || null;
