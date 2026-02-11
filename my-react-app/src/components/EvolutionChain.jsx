@@ -138,14 +138,23 @@ function ConditionIcon({ condition }) {
   return null;
 }
 
-// --- Chain connector (horizontal arrow + condition) ---
-function ChainLink({ condition }) {
+// --- Chain connector (arrow + condition) ---
+// vertical prop for mobile vertical layout
+function ChainLink({ condition, vertical = false }) {
   return (
-    <div className="flex flex-col items-center justify-center mx-6 shrink-0">
+    <div className={`flex items-center justify-center shrink-0 ${vertical ? 'flex-row my-2' : 'flex-col mx-4 sm:mx-6'}`}>
       <ConditionIcon condition={condition} />
-      <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-      </svg>
+      {vertical ? (
+        // Vertical arrow (pointing down)
+        <svg className="w-6 h-6 text-gray-400 dark:text-gray-500 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      ) : (
+        // Horizontal arrow (pointing right)
+        <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      )}
     </div>
   );
 }
@@ -262,21 +271,40 @@ function EvoCard({ node, isCurrent, currentSprite, currentTypes, revealed, onRev
 function LinearLayout({ tree, currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames }) {
   const nodes = flattenLinear(tree);
   return (
-    <div className="flex items-center justify-center gap-x-4">
-      {nodes.map((node, i) => {
-        const isCurrent = node.name === currentPokemonName;
-        return (
-          <div key={node.name} className="flex items-center">
-            {i > 0 && <ChainLink condition={node.condition} />}
-            <EvoCard
-              node={node} isCurrent={isCurrent}
-              currentSprite={currentSprite} currentTypes={currentTypes}
-              revealed={revealed} onReveal={onReveal} evoData={evoData} autoDiscover={autoDiscover} loadingNames={loadingNames}
-            />
-          </div>
-        );
-      })}
-    </div>
+    <>
+      {/* Mobile: Vertical layout */}
+      <div className="flex flex-col items-center sm:hidden">
+        {nodes.map((node, i) => {
+          const isCurrent = node.name === currentPokemonName;
+          return (
+            <div key={node.name} className="flex flex-col items-center">
+              {i > 0 && <ChainLink condition={node.condition} vertical />}
+              <EvoCard
+                node={node} isCurrent={isCurrent}
+                currentSprite={currentSprite} currentTypes={currentTypes}
+                revealed={revealed} onReveal={onReveal} evoData={evoData} autoDiscover={autoDiscover} loadingNames={loadingNames}
+              />
+            </div>
+          );
+        })}
+      </div>
+      {/* Desktop: Horizontal layout */}
+      <div className="hidden sm:flex items-center justify-center gap-x-4">
+        {nodes.map((node, i) => {
+          const isCurrent = node.name === currentPokemonName;
+          return (
+            <div key={node.name} className="flex items-center">
+              {i > 0 && <ChainLink condition={node.condition} />}
+              <EvoCard
+                node={node} isCurrent={isCurrent}
+                currentSprite={currentSprite} currentTypes={currentTypes}
+                revealed={revealed} onReveal={onReveal} evoData={evoData} autoDiscover={autoDiscover} loadingNames={loadingNames}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
@@ -299,37 +327,71 @@ function ForkLayout({ tree, currentPokemonName, currentSprite, currentTypes, rev
   const cardProps = { currentPokemonName, currentSprite, currentTypes, revealed, onReveal, evoData, autoDiscover, loadingNames };
 
   return (
-    <div className="flex items-center justify-center gap-x-4">
-      {/* Linear portion */}
-      {linearPart.map((node, i) => {
-        const isCurrent = node.name === currentPokemonName;
-        return (
-          <div key={node.name} className="flex items-center">
-            {i > 0 && <ChainLink condition={node.condition} />}
-            <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
-          </div>
-        );
-      })}
-
-      {/* Fork: 2 branches in diagonal */}
-      {branches.length === 2 && (
-        <div className="flex flex-col gap-2 ml-1">
-          {branches.map((branch, bi) => (
-            <div key={branch.name} className="flex items-center">
-              <ChainLink condition={branch.condition} />
-              <EvoCard node={branch} isCurrent={branch.name === currentPokemonName} {...cardProps} />
-              {/* If branch has further evolutions, render them inline */}
-              {branch.evolvesTo && branch.evolvesTo.map(sub => (
-                <div key={sub.name} className="flex items-center">
-                  <ChainLink condition={sub.condition} />
-                  <EvoCard node={sub} isCurrent={sub.name === currentPokemonName} {...cardProps} />
-                </div>
-              ))}
+    <>
+      {/* Mobile: Vertical layout */}
+      <div className="flex flex-col items-center sm:hidden">
+        {/* Linear portion */}
+        {linearPart.map((node, i) => {
+          const isCurrent = node.name === currentPokemonName;
+          return (
+            <div key={node.name} className="flex flex-col items-center">
+              {i > 0 && <ChainLink condition={node.condition} vertical />}
+              <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+          );
+        })}
+        {/* Fork branches stacked */}
+        {branches.length === 2 && (
+          <div className="flex flex-col items-center gap-4 mt-2">
+            {branches.map((branch) => (
+              <div key={branch.name} className="flex flex-col items-center">
+                <ChainLink condition={branch.condition} vertical />
+                <EvoCard node={branch} isCurrent={branch.name === currentPokemonName} {...cardProps} />
+                {branch.evolvesTo && branch.evolvesTo.map(sub => (
+                  <div key={sub.name} className="flex flex-col items-center">
+                    <ChainLink condition={sub.condition} vertical />
+                    <EvoCard node={sub} isCurrent={sub.name === currentPokemonName} {...cardProps} />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: Horizontal layout */}
+      <div className="hidden sm:flex items-center justify-center gap-x-4">
+        {/* Linear portion */}
+        {linearPart.map((node, i) => {
+          const isCurrent = node.name === currentPokemonName;
+          return (
+            <div key={node.name} className="flex items-center">
+              {i > 0 && <ChainLink condition={node.condition} />}
+              <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
+            </div>
+          );
+        })}
+
+        {/* Fork: 2 branches in diagonal */}
+        {branches.length === 2 && (
+          <div className="flex flex-col gap-2 ml-1">
+            {branches.map((branch) => (
+              <div key={branch.name} className="flex items-center">
+                <ChainLink condition={branch.condition} />
+                <EvoCard node={branch} isCurrent={branch.name === currentPokemonName} {...cardProps} />
+                {/* If branch has further evolutions, render them inline */}
+                {branch.evolvesTo && branch.evolvesTo.map(sub => (
+                  <div key={sub.name} className="flex items-center">
+                    <ChainLink condition={sub.condition} />
+                    <EvoCard node={sub} isCurrent={sub.name === currentPokemonName} {...cardProps} />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -355,47 +417,27 @@ function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes,
   const centerSize = 180; // px for center area
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Linear part before the circle (e.g., for chains where evolution starts after stage 1) */}
-      {linearPart.length > 0 && (
-        <div className="flex items-center justify-center gap-x-4 mb-2">
-          {linearPart.map((node, i) => {
-            const isCurrent = node.name === currentPokemonName;
-            return (
-              <div key={node.name} className="flex items-center">
-                {i > 0 && <ChainLink condition={node.condition} />}
-                <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Circular arrangement */}
-      <div className="relative" style={{ width: (radius * 2) + centerSize, height: (radius * 2) + centerSize, isolation: 'isolate' }}>
-        {/* SVG lines from center to each branch (behind cards) */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-          {branches.map((branch, i) => {
-            const angle = (2 * Math.PI * i / count) - Math.PI / 2;
-            const cx = (radius * 2 + centerSize) / 2;
-            const cy = (radius * 2 + centerSize) / 2;
-            const lineLength = (radius - 50) * 0.8;
-            const ex = cx + Math.cos(angle) * lineLength;
-            const ey = cy + Math.sin(angle) * lineLength;
-            return (
-              <line
-                key={i}
-                x1={cx} y1={cy} x2={ex} y2={ey}
-                stroke="rgba(156, 163, 175, 0.4)"
-                strokeWidth="2"
-                strokeDasharray="6 4"
-              />
-            );
-          })}
-        </svg>
+    <>
+      {/* Mobile: Vertical grid layout */}
+      <div className="flex flex-col items-center gap-4 sm:hidden">
+        {/* Linear part */}
+        {linearPart.length > 0 && (
+          <div className="flex flex-col items-center">
+            {linearPart.map((node, i) => {
+              const isCurrent = node.name === currentPokemonName;
+              return (
+                <div key={node.name} className="flex flex-col items-center">
+                  {i > 0 && <ChainLink condition={node.condition} vertical />}
+                  <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Center pokemon */}
-        <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
+        <div className="flex flex-col items-center">
+          <ChainLink condition={null} vertical />
           <EvoCard
             node={circleNode}
             isCurrent={circleNode.name === currentPokemonName}
@@ -403,33 +445,96 @@ function CircularLayout({ tree, currentPokemonName, currentSprite, currentTypes,
           />
         </div>
 
-        {/* Surrounding evolutions */}
-        {branches.map((branch, i) => {
-          const angle = (2 * Math.PI * i / count) - Math.PI / 2; // start from top
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius;
-
-          return (
-            <div
-              key={branch.name}
-              className="absolute flex flex-col items-center"
-              style={{
-                left: `calc(50% + ${x}px)`,
-                top: `calc(50% + ${y}px)`,
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1,
-              }}
-            >
-              {/* Condition badge */}
+        {/* Evolutions in a 2-column grid */}
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          {branches.map((branch) => (
+            <div key={branch.name} className="flex flex-col items-center">
               <div className="mb-1">
                 <ConditionIcon condition={branch.condition} />
               </div>
               <EvoCard node={branch} isCurrent={branch.name === currentPokemonName} {...cardProps} />
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Desktop: Circular layout */}
+      <div className="hidden sm:flex flex-col items-center gap-4">
+        {/* Linear part before the circle */}
+        {linearPart.length > 0 && (
+          <div className="flex items-center justify-center gap-x-4 mb-2">
+            {linearPart.map((node, i) => {
+              const isCurrent = node.name === currentPokemonName;
+              return (
+                <div key={node.name} className="flex items-center">
+                  {i > 0 && <ChainLink condition={node.condition} />}
+                  <EvoCard node={node} isCurrent={isCurrent} {...cardProps} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Circular arrangement */}
+        <div className="relative" style={{ width: (radius * 2) + centerSize, height: (radius * 2) + centerSize, isolation: 'isolate' }}>
+          {/* SVG lines from center to each branch (behind cards) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+            {branches.map((branch, i) => {
+              const angle = (2 * Math.PI * i / count) - Math.PI / 2;
+              const cx = (radius * 2 + centerSize) / 2;
+              const cy = (radius * 2 + centerSize) / 2;
+              const lineLength = (radius - 50) * 0.8;
+              const ex = cx + Math.cos(angle) * lineLength;
+              const ey = cy + Math.sin(angle) * lineLength;
+              return (
+                <line
+                  key={i}
+                  x1={cx} y1={cy} x2={ex} y2={ey}
+                  stroke="rgba(156, 163, 175, 0.4)"
+                  strokeWidth="2"
+                  strokeDasharray="6 4"
+                />
+              );
+            })}
+          </svg>
+
+          {/* Center pokemon */}
+          <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
+            <EvoCard
+              node={circleNode}
+              isCurrent={circleNode.name === currentPokemonName}
+              {...cardProps}
+            />
+          </div>
+
+          {/* Surrounding evolutions */}
+          {branches.map((branch, i) => {
+            const angle = (2 * Math.PI * i / count) - Math.PI / 2;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            return (
+              <div
+                key={branch.name}
+                className="absolute flex flex-col items-center"
+                style={{
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 1,
+                }}
+              >
+                {/* Condition badge */}
+                <div className="mb-1">
+                  <ConditionIcon condition={branch.condition} />
+                </div>
+                <EvoCard node={branch} isCurrent={branch.name === currentPokemonName} {...cardProps} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
 

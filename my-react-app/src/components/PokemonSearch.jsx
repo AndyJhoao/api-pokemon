@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Autocomplete from './Autocomplete';
 import EvolutionChain from './EvolutionChain';
 import { useAuth } from '../context/AuthContext';
-import { apiUrl } from '../config/api';
+import { usePokemon } from '../context/PokemonContext';
 
 const TYPE_COLORS = {
   normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C',
@@ -73,10 +73,16 @@ function parseStat(statStr) {
 
 export default function PokemonSearch() {
   const { token } = useAuth();
-  const [pokemon, setPokemon] = useState(null);
-  const [pokemonName, setPokemonName] = useState('pikachu');
+  const {
+    currentPokemon,
+    currentPokemonName,
+    setCurrentPokemonName,
+    fetchPokemon: fetchPokemonFromContext,
+  } = usePokemon();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [autoDiscover, setAutoDiscover] = useState(() => {
     try { return localStorage.getItem('autoDiscover') === 'true'; } catch { return false; }
   });
@@ -89,41 +95,39 @@ export default function PokemonSearch() {
     });
   };
 
-  const fetchPokemon = async (name) => {
+  const doSearch = async (name) => {
     const trimmed = (name || '').trim().toLowerCase();
     if (!trimmed) return;
+
     setLoading(true);
     setError(null);
-    try {
-      const response = await fetch(apiUrl(`/api/pokemon/${trimmed}`), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.status === 429) {
-        const data = await response.json();
-        throw new Error(data.error || 'Guest limit reached. Register for unlimited access.');
-      }
-      if (!response.ok) throw new Error('Pokémon not found');
-      const data = await response.json();
-      setPokemon(data);
-    } catch (err) {
-      setPokemon(null);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+
+    const result = await fetchPokemonFromContext(trimmed, token);
+
+    if (result.error) {
+      setError(result.error);
     }
+
+    setLoading(false);
   };
 
+  // Only fetch on initial load if no Pokemon is cached
   useEffect(() => {
-    fetchPokemon(pokemonName);
-  }, []);
+    if (initialLoad) {
+      setInitialLoad(false);
+      if (!currentPokemon) {
+        doSearch(currentPokemonName);
+      }
+    }
+  }, [initialLoad, currentPokemon, currentPokemonName]);
 
   const handleSelect = (name) => {
-    setPokemonName(name);
-    fetchPokemon(name);
+    setCurrentPokemonName(name);
+    doSearch(name);
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') fetchPokemon(pokemonName);
+    if (e.key === 'Enter') doSearch(currentPokemonName);
   };
 
   return (
@@ -131,14 +135,14 @@ export default function PokemonSearch() {
       {/* Search */}
       <div className="flex gap-3 mb-10 w-full max-w-md">
         <Autocomplete
-          value={pokemonName}
-          onChange={setPokemonName}
+          value={currentPokemonName}
+          onChange={setCurrentPokemonName}
           onSelect={handleSelect}
           placeholder="e.g. charizard"
           className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-400 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent backdrop-blur-sm transition-all"
         />
         <button
-          onClick={() => fetchPokemon(pokemonName)}
+          onClick={() => doSearch(currentPokemonName)}
           onKeyDown={handleKeyDown}
           disabled={loading}
           className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all active:scale-95 flex items-center justify-center gap-2 min-w-[100px]"
@@ -161,21 +165,21 @@ export default function PokemonSearch() {
         </div>
       )}
 
-      {pokemon && !loading && (
+      {currentPokemon && !loading && (
         <div className="card-enter bg-white/90 border border-gray-200 dark:bg-white/5 dark:border-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-full max-w-md">
           <div className="flex justify-center mb-4">
             <div className="relative">
               <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
-              <img src={pokemon.sprites} alt={pokemon.name} className="sprite-bounce relative h-44 w-44 object-contain drop-shadow-lg" />
+              <img src={currentPokemon.sprites} alt={currentPokemon.name} className="sprite-bounce relative h-44 w-44 object-contain drop-shadow-lg" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center capitalize mb-3">{pokemon.name}</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center capitalize mb-3">{currentPokemon.name}</h2>
           <div className="flex justify-center gap-2 mb-5">
-            {pokemon.types.map((type) => <TypeBadge key={type} type={type} />)}
+            {currentPokemon.types.map((type) => <TypeBadge key={type} type={type} />)}
           </div>
           <div className="space-y-2 mb-5">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Base Stats</h3>
-            {pokemon.stats.map((stat, i) => {
+            {currentPokemon.stats.map((stat, i) => {
               const { name, value } = parseStat(stat);
               return <StatBar key={i} label={name} value={value} />;
             })}
@@ -183,7 +187,7 @@ export default function PokemonSearch() {
           <div>
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Abilities</h3>
             <div className="flex flex-wrap gap-2">
-              {pokemon.abilities.map((ability) => (
+              {currentPokemon.abilities.map((ability) => (
                 <span key={ability} className="px-3 py-1 bg-gray-100 dark:bg-white/10 rounded-lg text-sm text-gray-700 dark:text-gray-300 capitalize">{ability}</span>
               ))}
             </div>
@@ -192,7 +196,7 @@ export default function PokemonSearch() {
       )}
 
       {/* Evolution Chain */}
-      {pokemon && !loading && pokemon.evolutionTree && (
+      {currentPokemon && !loading && currentPokemon.evolutionTree && (
         <div className="card-enter w-full flex flex-col items-center">
           {/* Auto Discover Toggle */}
           <div className="flex items-center gap-2 mt-6 mb-2">
@@ -206,20 +210,20 @@ export default function PokemonSearch() {
           </div>
 
           <EvolutionChain
-            evolutionTree={pokemon.evolutionTree}
-            currentPokemonName={pokemon.name}
-            currentSprite={pokemon.sprites}
-            currentTypes={pokemon.types}
+            evolutionTree={currentPokemon.evolutionTree}
+            currentPokemonName={currentPokemon.name}
+            currentSprite={currentPokemon.sprites}
+            currentTypes={currentPokemon.types}
             autoDiscover={autoDiscover}
             token={token}
           />
 
           {/* Mega Evolutions */}
-          {pokemon.megaEvolutions && pokemon.megaEvolutions.length > 0 && (
+          {currentPokemon.megaEvolutions && currentPokemon.megaEvolutions.length > 0 && (
             <div className="mt-4 w-full max-w-2xl">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 text-center">Mega Evolutions</h3>
               <div className="flex justify-center gap-2 flex-wrap">
-                {pokemon.megaEvolutions.map(mega => (
+                {currentPokemon.megaEvolutions.map(mega => (
                   <span key={mega} className="px-3 py-1 bg-purple-100 dark:bg-purple-500/20 border border-purple-300 dark:border-purple-500/30 rounded-lg text-sm text-purple-700 dark:text-purple-300 capitalize">
                     {mega.replace(/-/g, ' ')}
                   </span>
