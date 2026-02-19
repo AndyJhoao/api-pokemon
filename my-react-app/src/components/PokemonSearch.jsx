@@ -26,9 +26,9 @@ function StatBar({ label, value }) {
   const color = percent > 70 ? '#4ade80' : percent > 40 ? '#facc15' : '#f87171';
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="w-16 text-right text-gray-500 dark:text-gray-400 capitalize text-xs font-medium">{label}</span>
-      <span className="w-8 text-right font-bold text-gray-900 dark:text-white">{value}</span>
-      <div className="flex-1 h-2.5 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
+      <span className="w-16 text-right text-gray-600 dark:text-gray-400 capitalize text-xs font-medium">{label}</span>
+      <span className="w-8 text-right font-bold text-gray-800 dark:text-white">{value}</span>
+      <div className="flex-1 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
         <div className="stat-bar-fill h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
       </div>
     </div>
@@ -59,8 +59,8 @@ function TypeBadge({ type }) {
 function PokeballSpinner() {
   return (
     <div className="flex flex-col items-center gap-4 py-12">
-      <div className="pokeball-spin w-12 h-12 rounded-full border-4 border-gray-300 dark:border-white border-t-red-500 border-r-red-500" />
-      <p className="text-gray-500 dark:text-gray-400 text-sm">Searching...</p>
+      <div className="pokeball-spin w-12 h-12 rounded-full border-4 border-blue-300 dark:border-white border-t-red-500 border-r-red-500" />
+      <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Searching...</p>
     </div>
   );
 }
@@ -139,7 +139,7 @@ export default function PokemonSearch() {
           onChange={setCurrentPokemonName}
           onSelect={handleSelect}
           placeholder="e.g. charizard"
-          className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 placeholder-gray-400 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent backdrop-blur-sm transition-all"
+          className="w-full px-4 py-3 rounded-xl bg-white border-2 border-blue-200 text-gray-900 placeholder-gray-500 shadow-sm dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent backdrop-blur-sm transition-all"
         />
         <button
           onClick={() => doSearch(currentPokemonName)}
@@ -159,36 +159,36 @@ export default function PokemonSearch() {
       {loading && <PokeballSpinner />}
 
       {error && !loading && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-6 py-4 text-red-400 text-center max-w-md">
+        <div className="bg-red-100 border-2 border-red-300 dark:bg-red-500/10 dark:border-red-500/30 rounded-xl px-6 py-4 text-red-700 dark:text-red-400 text-center max-w-md shadow-sm">
           <p className="font-semibold">Oops!</p>
           <p className="text-sm mt-1">{error}</p>
         </div>
       )}
 
       {currentPokemon && !loading && (
-        <div className="card-enter bg-white/90 border border-gray-200 dark:bg-white/5 dark:border-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-full max-w-md">
+        <div className="card-enter bg-white border-2 border-blue-200 dark:bg-white/5 dark:border-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-full max-w-md">
           <div className="flex justify-center mb-4">
             <div className="relative">
               <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
               <img src={currentPokemon.sprites} alt={currentPokemon.name} className="sprite-bounce relative h-44 w-44 object-contain drop-shadow-lg" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center capitalize mb-3">{currentPokemon.name}</h2>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white text-center capitalize mb-3">{currentPokemon.name}</h2>
           <div className="flex justify-center gap-2 mb-5">
             {currentPokemon.types.map((type) => <TypeBadge key={type} type={type} />)}
           </div>
           <div className="space-y-2 mb-5">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Base Stats</h3>
+            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-widest mb-2">Base Stats</h3>
             {currentPokemon.stats.map((stat, i) => {
               const { name, value } = parseStat(stat);
               return <StatBar key={i} label={name} value={value} />;
             })}
           </div>
           <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Abilities</h3>
+            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-widest mb-2">Abilities</h3>
             <div className="flex flex-wrap gap-2">
               {currentPokemon.abilities.map((ability) => (
-                <span key={ability} className="px-3 py-1 bg-gray-100 dark:bg-white/10 rounded-lg text-sm text-gray-700 dark:text-gray-300 capitalize">{ability}</span>
+                <span key={ability} className="px-3 py-1 bg-blue-100 border border-blue-200 dark:bg-white/10 dark:border-transparent rounded-lg text-sm text-blue-900 dark:text-gray-300 capitalize font-medium">{ability}</span>
               ))}
             </div>
           </div>
@@ -200,12 +200,12 @@ export default function PokemonSearch() {
         <div className="card-enter w-full flex flex-col items-center">
           {/* Auto Discover Toggle */}
           <div className="flex items-center gap-2 mt-6 mb-2">
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Auto Discover</span>
+            <span className="text-xs text-gray-700 dark:text-gray-400 font-medium">Auto Discover</span>
             <button
               onClick={toggleAutoDiscover}
-              className={`relative w-10 h-5 rounded-full transition-colors ${autoDiscover ? 'bg-amber-400' : 'bg-gray-300 dark:bg-gray-600'}`}
+              className={`relative w-10 h-5 rounded-full transition-colors ${autoDiscover ? 'bg-amber-400' : 'bg-blue-200 dark:bg-gray-600'}`}
             >
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${autoDiscover ? 'translate-x-5' : ''}`} />
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-md transition-transform ${autoDiscover ? 'translate-x-5' : ''}`} />
             </button>
           </div>
 
@@ -221,10 +221,10 @@ export default function PokemonSearch() {
           {/* Mega Evolutions */}
           {currentPokemon.megaEvolutions && currentPokemon.megaEvolutions.length > 0 && (
             <div className="mt-4 w-full max-w-2xl">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 text-center">Mega Evolutions</h3>
+              <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-widest mb-2 text-center">Mega Evolutions</h3>
               <div className="flex justify-center gap-2 flex-wrap">
                 {currentPokemon.megaEvolutions.map(mega => (
-                  <span key={mega} className="px-3 py-1 bg-purple-100 dark:bg-purple-500/20 border border-purple-300 dark:border-purple-500/30 rounded-lg text-sm text-purple-700 dark:text-purple-300 capitalize">
+                  <span key={mega} className="px-3 py-1 bg-purple-100 border-2 border-purple-300 dark:bg-purple-500/20 dark:border-purple-500/30 rounded-lg text-sm text-purple-800 dark:text-purple-300 capitalize font-medium">
                     {mega.replace(/-/g, ' ')}
                   </span>
                 ))}

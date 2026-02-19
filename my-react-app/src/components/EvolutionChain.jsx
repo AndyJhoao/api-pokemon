@@ -146,12 +146,12 @@ function ChainLink({ condition, vertical = false }) {
       <ConditionIcon condition={condition} />
       {vertical ? (
         // Vertical arrow (pointing down)
-        <svg className="w-6 h-6 text-gray-400 dark:text-gray-500 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-6 h-6 text-blue-400 dark:text-gray-500 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
         </svg>
       ) : (
         // Horizontal arrow (pointing right)
-        <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-6 h-6 text-blue-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
         </svg>
       )}
@@ -175,18 +175,18 @@ function LockedCard({ onClick, isLoading }) {
     <button
       onClick={onClick}
       disabled={isLoading}
-      className="evo-locked group relative w-40 h-52 rounded-xl bg-gray-200/80 dark:bg-white/5 border-2 border-dashed border-gray-300 dark:border-white/20 backdrop-blur-sm cursor-pointer transition-all hover:scale-105 hover:border-amber-400 dark:hover:border-amber-400 overflow-hidden disabled:cursor-wait disabled:hover:scale-100"
+      className="evo-locked group relative w-40 h-52 rounded-xl bg-blue-100 border-2 border-dashed border-blue-300 dark:bg-white/5 dark:border-white/20 backdrop-blur-sm cursor-pointer transition-all hover:scale-105 hover:border-amber-400 dark:hover:border-amber-400 overflow-hidden disabled:cursor-wait disabled:hover:scale-100"
     >
       <div className="absolute inset-0 evo-sparkle" />
       <div className="absolute inset-0 flex items-center justify-center">
         {isLoading ? (
           <CardSpinner />
         ) : (
-          <span className="text-4xl opacity-60 group-hover:opacity-100 transition-opacity">?</span>
+          <span className="text-4xl text-gray-600 dark:text-white opacity-60 group-hover:opacity-100 transition-opacity">?</span>
         )}
       </div>
       <div className="absolute bottom-1 left-0 right-0 text-center">
-        <span className="text-[9px] text-gray-400 dark:text-gray-500">
+        <span className="text-[9px] text-gray-600 dark:text-gray-500 font-medium">
           {isLoading ? 'Discovering...' : 'Click to reveal'}
         </span>
       </div>
@@ -199,8 +199,8 @@ function RevealedCard({ name, sprite, types, isCurrent, isLoading }) {
   return (
     <div className={`evo-reveal relative w-40 rounded-xl p-3 text-center transition-all ${
       isCurrent
-        ? 'bg-amber-50/90 dark:bg-amber-500/10 border-2 border-amber-400 shadow-lg shadow-amber-400/20'
-        : 'bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10'
+        ? 'bg-amber-50 border-2 border-amber-400 shadow-lg shadow-amber-400/20 dark:bg-amber-500/10 dark:border-amber-400'
+        : 'bg-white border-2 border-blue-200 dark:bg-white/5 dark:border-white/10'
     }`}>
       {isCurrent && (
         <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-400 text-black text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -213,10 +213,10 @@ function RevealedCard({ name, sprite, types, isCurrent, isLoading }) {
         ) : sprite ? (
           <img src={sprite} alt={name} className="w-full h-full object-contain drop-shadow-md" />
         ) : (
-          <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-lg">?</div>
+          <div className="w-full h-full bg-blue-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-lg text-blue-600 dark:text-gray-300">?</div>
         )}
       </div>
-      <p className="text-xs font-bold text-gray-900 dark:text-white capitalize truncate">{name}</p>
+      <p className="text-xs font-bold text-gray-800 dark:text-white capitalize truncate">{name}</p>
       {types && (
         <div className="flex justify-center gap-1 mt-1 flex-wrap">
           {types.map(t => {
@@ -608,7 +608,7 @@ export default function EvolutionChain({ evolutionTree, currentPokemonName, curr
 
   return (
     <div className="w-full mt-16">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 text-center pb-16">Evolution Chain</h3>
+      <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-500 uppercase tracking-widest mb-3 text-center pb-16">Evolution Chain</h3>
       {layout === 'linear' && <LinearLayout {...commonProps} />}
       {layout === 'fork' && <ForkLayout {...commonProps} />}
       {layout === 'circular' && <CircularLayout {...commonProps} />}

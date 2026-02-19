@@ -30,11 +30,11 @@ export default function RegisterPage() {
 
   return (
     <div className="flex-1 flex items-center justify-center px-4">
-      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">Create Account</h2>
+      <div className="bg-white border-2 border-blue-200 dark:bg-white/5 dark:border-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-6">Create Account</h2>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2 text-red-400 text-sm text-center mb-4">
+          <div className="bg-red-100 border-2 border-red-300 dark:bg-red-500/10 dark:border-red-500/30 rounded-lg px-4 py-2 text-red-700 dark:text-red-400 text-sm text-center mb-4">
             {error}
           </div>
         )}
@@ -46,7 +46,7 @@ export default function RegisterPage() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-200 text-gray-900 placeholder-gray-500 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent transition-all"
           />
           <input
             type="email"
@@ -54,7 +54,7 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-200 text-gray-900 placeholder-gray-500 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent transition-all"
           />
           <div className="relative">
             <input
@@ -64,7 +64,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 pr-12 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-4 py-3 pr-12 rounded-xl bg-blue-50 border-2 border-blue-200 text-gray-900 placeholder-gray-500 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent transition-all"
             />
             <EyeToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
           </div>
@@ -77,9 +77,9 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-red-400 hover:text-red-300">
+          <Link to="/login" className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium">
             Login
           </Link>
         </p>

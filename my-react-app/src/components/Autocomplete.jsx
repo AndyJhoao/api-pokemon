@@ -79,7 +79,7 @@ export default function Autocomplete({ value, onChange, onSelect, placeholder, c
         className={className}
       />
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-gray-800 dark:bg-gray-800 border border-white/20 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto">
+        <ul className="absolute z-50 w-full mt-1 bg-white border-2 border-blue-200 dark:bg-gray-800 dark:border-white/20 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto">
           {suggestions.map((name, i) => (
             <li
               key={name}
@@ -87,7 +87,7 @@ export default function Autocomplete({ value, onChange, onSelect, placeholder, c
               className={`px-4 py-2 cursor-pointer capitalize text-sm transition-colors ${
                 i === activeIndex
                   ? 'bg-red-600 text-white'
-                  : 'text-gray-300 hover:bg-white/10'
+                  : 'text-gray-800 hover:bg-blue-50 dark:text-gray-300 dark:hover:bg-white/10'
               }`}
             >
               {name}

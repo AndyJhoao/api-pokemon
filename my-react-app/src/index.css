@@ -2,10 +2,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Safari iOS safe area support - Force dark mode colors */
+/* Safari iOS safe area support - Responsive theme colors */
 html {
-  background-color: #1a1a2e;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  /* Light mode background - modern vibrant gradient */
+  background-color: #f0f9ff;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 30%, #e0e7ff 70%, #ede9fe 100%);
   /* Extend background to cover iOS safe areas */
   height: 100%;
   min-height: 100%;
@@ -15,6 +16,12 @@ html {
   background-size: cover;
 }
 
+/* Dark mode background */
+html.dark {
+  background-color: rgb(17 24 39);
+  background: rgb(17 24 39);
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -22,9 +29,10 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
-  background-color: #1a1a2e;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #e5e7eb;
+  /* Light mode background - modern vibrant gradient */
+  background-color: #f0f9ff;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 30%, #e0e7ff 70%, #ede9fe 100%);
+  color: #0f172a;
   /* Safe area for iOS notch and home indicator */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
@@ -33,12 +41,18 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent white flash on iOS */
+/* Dark mode body */
+html.dark body {
+  background-color: rgb(17 24 39);
+  background: rgb(17 24 39);
+  color: #e5e7eb;
+}
+
+/* Prevent flash on page load */
 #root {
   height: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
-  background-color: #1a1a2e;
   background-attachment: fixed;
 }

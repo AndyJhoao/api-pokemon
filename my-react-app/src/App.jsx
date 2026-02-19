@@ -11,8 +11,8 @@ function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="pokeball-spin w-12 h-12 rounded-full border-4 border-gray-300 dark:border-white border-t-red-500 border-r-red-500" />
-        <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
+        <div className="pokeball-spin w-12 h-12 rounded-full border-4 border-blue-300 dark:border-white border-t-red-500 border-r-red-500" />
+        <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Loading...</p>
       </div>
     </div>
   );
@@ -27,10 +27,10 @@ function HomePage() {
   return (
     <div className="flex-1 flex flex-col items-center px-4 py-10">
       <div className="mb-8 text-center">
-        <h1 className="text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
+        <h1 className="text-5xl font-extrabold text-gray-800 dark:text-white tracking-tight mb-2">
           Pokédex
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">Search any Pokémon by name</p>
+        <p className="text-gray-600 dark:text-gray-400 text-sm">Search any Pokémon by name</p>
       </div>
       <PokemonSearch />
     </div>

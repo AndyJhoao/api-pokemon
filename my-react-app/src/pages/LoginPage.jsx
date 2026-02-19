@@ -40,11 +40,11 @@ export default function LoginPage() {
 
   return (
     <div className="flex-1 flex items-center justify-center px-4">
-      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">Welcome Back</h2>
+      <div className="bg-white border-2 border-blue-200 dark:bg-white/5 dark:border-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-6">Welcome Back</h2>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2 text-red-400 text-sm text-center mb-4">
+          <div className="bg-red-100 border-2 border-red-300 dark:bg-red-500/10 dark:border-red-500/30 rounded-lg px-4 py-2 text-red-700 dark:text-red-400 text-sm text-center mb-4">
             {error}
           </div>
         )}
@@ -56,7 +56,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-200 text-gray-900 placeholder-gray-500 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent transition-all"
           />
           <div className="relative">
             <input
@@ -65,7 +65,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 pr-12 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-4 py-3 pr-12 rounded-xl bg-blue-50 border-2 border-blue-200 text-gray-900 placeholder-gray-500 dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-transparent transition-all"
             />
             <EyeToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
           </div>
@@ -82,13 +82,13 @@ export default function LoginPage() {
           <button
             onClick={handleGuest}
             disabled={guestLoading}
-            className="w-full py-3 bg-white/10 hover:bg-white/20 disabled:opacity-70 text-gray-300 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-blue-100 hover:bg-blue-200 border border-blue-300 dark:bg-white/10 dark:hover:bg-white/20 dark:border-transparent disabled:opacity-70 text-blue-900 dark:text-gray-300 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
           >
             {guestLoading ? <><ButtonSpinner /> Entering...</> : 'Continue as Guest'}
           </button>
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-500">
             Don't have an account?{' '}
-            <Link to="/register" className="text-red-400 hover:text-red-300">
+            <Link to="/register" className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium">
               Register
             </Link>
           </p>
